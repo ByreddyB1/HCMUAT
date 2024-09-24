@@ -1,0 +1,330 @@
+<template>
+    <template if:true={showSpinner}>
+        <lightning-spinner alternative-text="Loading" size="large" variant="brand" class="spinner_container">
+        </lightning-spinner>
+    </template>
+    <div class="slds-text-heading_medium slds-text-align_center slds-p-bottom_small">Submit New Hearing Request(s)</div>
+    <div class=" slds-text-align_left" style="font-weight: bold;border-radius: 60px;background: antiquewhite;width: 39.5%;padding: 1rem 1rem 1rem 2rem;">
+        <p>Do not use this portal to request an informal conference/hearing for:</p>
+        <ul class="slds-list_dotted">
+            <li>the denial of your Principal Residence Exemption, or</li>
+            <li>an Explanation of Change letter adjusting or denying your refund.</li>
+        </ul>
+        <p>Please refer to the instructions on your notice.</p>
+    </div>
+    <div style={styleComp} class="slds-p-top_small">
+        <lightning-combobox 
+            name="Request Type" 
+            label="Request Type" 
+            value={selectedRequestType} 
+            placeholder="Select Request Type..." 
+            options={requestTypeoptions}
+            onchange={handleChangeRequestType} 
+            required></lightning-combobox>
+    </div>
+    <div if:true={selectedRequestType}>
+        <div class="slds-section slds-is-open slds-p-top_small">
+            <h3 class="slds-section__title slds-theme_shade">
+                <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Taxpayer Information</span>
+            </h3>
+        </div>
+        <lightning-record-edit-form 
+            object-api-name="Docket__c" 
+            onsubmit={handleSubmit} 
+            onsuccess={handleSuccess} 
+            onerror={handleError}>
+                <!-- <lightning-messages></lightning-messages> -->
+                <lightning-layout multiple-rows class="slds-p-top_medium">
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Taxpayer_Name__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Account_Number__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Daytime_Phone_Number__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field field-name="Fax_Number__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Email_Address__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Street__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="City__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="State__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Zip_Code__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field  field-name="Filing_on_Behalf_of_a_Taxpayer__c" onchange={onChangeCheckbox} variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+            </lightning-layout>
+            <div if:true={isCheckedBehalfTaxpayer} class="slds-section slds-is-open slds-p-top_small">
+                <h3 class="slds-section__title slds-theme_shade">
+                    <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Requestor Information</span>
+                </h3>
+            </div>
+            <lightning-layout multiple-rows if:true={isCheckedBehalfTaxpayer} class="slds-p-top_medium">
+                <lightning-layout-item size="6" >
+                    <lightning-input-field  required field-name="Requestor_Name__c" variant="label-stacked">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" >
+                    <lightning-input-field field-name="Title_or_Relationship_to_Taxpayer__c" variant="label-stacked">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" >
+                    <lightning-input-field field-name="Requestor_Company_Name__c" variant="label-stacked">
+                    </lightning-input-field>
+                </lightning-layout-item>
+                <lightning-layout-item size="6" >
+                    <lightning-input-field required field-name="Requestor_Daytime_Phone_Number__c" variant="label-stacked">
+                    </lightning-input-field>
+                </lightning-layout-item>
+            </lightning-layout>
+            <div if:true={isShowIntentSecondaryRefundSection}>
+                <div class="slds-section slds-is-open slds-p-top_small">
+                    <h3 class="slds-section__title slds-theme_shade">
+                        <span class="slds-truncate slds-p-horizontal_small" title="Section Title">{selectedRequestType} Information</span>
+                    </h3>
+                </div>
+                <lightning-layout multiple-rows class="slds-p-top_medium">
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Select_Issues_Applicable_to_Appeal__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field field-name="Appeal_Amount__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field field-name="Does_this_Appeal_Involve_an_Audit__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="What_Relief_are_You_Requesting__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                    <lightning-layout-item size="6" >
+                        <lightning-input-field required field-name="Provide_an_Explanation_of_the_Dispute__c" variant="label-stacked">
+                        </lightning-input-field>
+                    </lightning-layout-item>
+                </lightning-layout>
+            </div>
+            
+                <div if:true={isShowLicenseDenialSection}>
+                    <div class="slds-section slds-is-open slds-p-top_small">
+                        <h3 class="slds-section__title slds-theme_shade">
+                            <span class="slds-truncate slds-p-horizontal_small" title="Section Title">{selectedRequestType} Information</span>
+                        </h3>
+                    </div>
+                    <lightning-layout multiple-rows class="slds-p-top_medium">
+                        <lightning-layout-item size="6" >
+                            <lightning-record-edit-form 
+                                object-api-name="Docket_Request__c" 
+                                >
+                                <lightning-input-field  required onchange={onDocketRequestFieldsChange} data-field="Date_of_Notice__c" field-name="Date_of_Notice__c" variant="label-stacked">
+                                </lightning-input-field>
+                            </lightning-record-edit-form>
+                        </lightning-layout-item>
+                         <lightning-layout-item size="6" >
+                            <lightning-input-field required field-name="Provide_an_Explanation_of_the_Dispute__c" variant="label-stacked">
+                            </lightning-input-field>
+                        </lightning-layout-item> 
+                        <lightning-layout-item size="12" class="slds-p-left_xx-small slds-p-bottom_xx-small" >
+                            <lightning-button  variant="brand" label="Upload File" data-id="Single Request"  onclick={onUploadFileClick}>
+                            </lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+                <lightning-record-edit-form 
+            object-api-name="Docket_Request__c" record-type-id={docketRequestRecordTypeId}
+            >
+                <div if:true={isShowSeizureSection}>
+                    <div class="slds-section slds-is-open slds-p-top_small">
+                        <h3 class="slds-section__title slds-theme_shade">
+                            <span class="slds-truncate slds-p-horizontal_small" title="Section Title">{selectedRequestType} Information</span>
+                        </h3>
+                    </div>
+                    <lightning-layout multiple-rows class="slds-p-top_medium">
+                        <lightning-layout-item size="6" >
+                            <lightning-input-field required onchange={onDocketRequestFieldsChange} data-field="Complaint_Number__c" field-name="Complaint_Number__c" variant="label-stacked">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="6" >
+                            <lightning-input-field required onchange={onDocketRequestFieldsChange} data-field="Date_of_Notice__c" field-name="Date_of_Notice__c" variant="label-stacked">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="6" >
+                            <lightning-input-field required onchange={onDocketRequestFieldsChange} data-field="Owner_Believed_to_Be__c" field-name="Owner_Believed_to_Be__c"  variant="label-stacked">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <!-- <lightning-layout-item size="6" >
+                        </lightning-layout-item> -->
+                        <lightning-layout-item size="6" >
+                            <lightning-input-field required onchange={onDocketRequestFieldsChange} data-field="Location_Where_Seized__c" field-name="Location_Where_Seized__c" variant="label-stacked">
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                         <lightning-layout-item size="6" >
+                            <lightning-record-edit-form 
+                                object-api-name="Docket__c" 
+                                >
+                            <lightning-input-field class="ProvideAnExp" required field-name="Provide_an_Explanation_of_the_Dispute__c" variant="label-stacked">
+                            </lightning-input-field>
+                        </lightning-record-edit-form>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" class="slds-p-left_xx-small slds-p-bottom_xx-small" >
+                            <lightning-button  variant="brand" label="Upload File" data-id="Single Request"  onclick={onUploadFileClick}>
+                            </lightning-button>
+                        </lightning-layout-item>
+                    </lightning-layout>
+                </div>
+                <div if:true={isShowRequestTypeSection}>
+                    <div class="slds-section slds-is-open slds-p-top_small">
+                        <h3 class="slds-section__title slds-theme_shade">
+                            <span class="slds-truncate slds-p-horizontal_small" title="Section Title">Request Information</span>
+                        </h3>
+                    </div>
+                    
+                        <template for:each={requestData} for:item="row" for:index="index">
+                            <div key={row.id} style="border: 1px solid #bfb7b7;" class="slds-m-bottom_small">
+                            <lightning-layout multiple-rows  class="slds-p-top_medium" >
+                                <lightning-layout-item size="11"  >
+                                        <lightning-layout multiple-rows >
+                                            <lightning-layout-item class="slds-p-horizontal_xx-small" if:true={isShowSubtype} size="6" >
+                                                <lightning-combobox 
+                                                    class="request-information-section nameCmp"
+                                                    data-field="Subtype"
+                                                    data-id={row.id}
+                                                    name="Request Subtype" 
+                                                    label="Request Subtype" 
+                                                    value={row.subType} 
+                                                    placeholder="Select Request Subtype..." 
+                                                    options={requestSubTypeoptions}
+                                                    onchange={handleChangeRequestSubType} 
+                                                    required></lightning-combobox>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="6" >
+                                                <lightning-input-field onchange={onDocketRequestsFieldsChange} data-id={row.id} class="request-information-section" required data-field="Date_of_Notice__c" value={row.dateOfNotice} field-name="Date_of_Notice__c" variant="label-stacked">
+                                                </lightning-input-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item if:true={row.isShowIntentNumber} size="6" >
+                                                <lightning-input-field  onchange={onDocketRequestsFieldsChange} data-id={row.id} class="request-information-section" required data-field="Intent_Number__c" value={row.intentNumber} field-name="Intent_Number__c" variant="label-stacked">
+                                                </lightning-input-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="6" >
+                                                <lightning-input-field onchange={onDocketRequestsFieldsChange} data-id={row.id} class="request-information-section" required data-field="Tax_Period_End_Date__c" value={row.taxEndDate} field-name="Tax_Period_End_Date__c" variant="label-stacked">
+                                                </lightning-input-field>
+                                            </lightning-layout-item>
+                                            <lightning-layout-item size="6" >
+                                                <lightning-input-field onchange={onDocketRequestsFieldsChange} data-id={row.id} class="request-information-section" required data-field="Tax_Type__c" value={row.taxType} field-name="Tax_Type__c" variant="label-stacked">
+                                                </lightning-input-field>
+                                            </lightning-layout-item>
+                                            <!-- <lightning-layout-item size="6" >
+                                                <lightning-input-field data-id={row.id} class="request-information-section" required data-field="Taxpayer_Notes__c" field-name="Taxpayer_Notes__c" variant="label-stacked">
+                                                </lightning-input-field>
+                                            </lightning-layout-item> -->
+                                            <lightning-layout-item size="12" class="slds-p-left_xx-small slds-p-bottom_xx-small" >
+                                                <lightning-button  data-id={row.id} variant="brand" label="Upload File" onclick={onUploadFileClick}>
+                                                </lightning-button>
+                                            </lightning-layout-item>
+                                        </lightning-layout>
+                                        
+                                </lightning-layout-item>
+                                <lightning-layout-item size="1" >
+                                    <lightning-button-icon if:true={row.isLast} data-id={row.id} icon-name="utility:delete"
+                                                                value={index} onclick={removeRow} variant="bare" 
+                                                                 class="slds-p-top_xx-large slds-align_absolute-center">
+                                                            </lightning-button-icon>
+                                </lightning-layout-item>
+                            </lightning-layout>
+                        </div>
+                        </template>
+                    
+                    <lightning-button   variant="brand" label="Add Additional Hearing Request" onclick={addRow}>
+                    </lightning-button>
+                </div>
+                
+            </lightning-record-edit-form>
+            <div>
+                <lightning-button  type='submit' class="slds-p-top_x-large slds-align_absolute-center" variant="brand" label="Submit Hearing Request(s)" >
+                    
+                </lightning-button>
+            </div>
+        </lightning-record-edit-form>
+    </div>
+    <template if:true={isModalOpen}>
+        <!-- Modal/Popup Box LWC starts here -->
+        <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true" aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+            <div class="slds-modal__container">
+                <!-- Modal/Popup Box LWC header here -->
+                <header class="slds-modal__header">
+                    <button class="slds-button slds-button_icon slds-modal__close slds-button_icon-inverse" title="Close" onclick={closeModal}>
+                        <lightning-icon icon-name="utility:close"
+                            alternative-text="close"
+                            variant="inverse"
+                            size="small" ></lightning-icon>
+                        <span class="slds-assistive-text">Close</span>
+                    </button>
+                    <h2 id="modal-heading-01" class="slds-text-heading_medium slds-hyphenate">Docket Attachment</h2>
+                </header>
+                <!-- Modal/Popup Box LWC body starts here -->
+                <div class="slds-modal__content slds-p-around_medium" id="modal-content-id-1">
+                    <lightning-record-edit-form class ="docket-attachment" object-api-name="Docket_Attachment__c"  onerror={handleErrorAttachment}>
+                    
+                    <lightning-layout multiple-rows class="slds-p-around_medium">
+                    <div  style="width: 100%; height: 210px;">
+                        <lightning-layout-item size="12"  class="slds-p-top_large">
+                            <lightning-combobox class="slds-p-top_medium"
+                                required
+                                name="Attachment Type"
+                                label="Attachment Type"
+                                value={attachmentTypeValue}
+                                placeholder="Select attachment type..."
+                                options={attachmentTypeOptions}
+                                onchange={handleChangeAttachmentType} ></lightning-combobox>
+                        </lightning-layout-item>
+                        <lightning-layout-item if:true={isShowToNote} size="12" >
+                            <lightning-input-field  variant="label-stacked" field-name="Taxpayer_Notes__c" required={isNoteRequire} onchange={onChangeNotesCom}>
+                            </lightning-input-field>
+                        </lightning-layout-item>
+                        <lightning-layout-item size="12" >
+                            <lightning-file-upload label="Upload File" variant="label-stacked" name="fileUploader" disabled={enableToUploadButton}
+                                multiple onuploadfinished={handleUploadFinished}>
+                            </lightning-file-upload>
+                        </lightning-layout-item>
+                    </div>
+                    </lightning-layout>
+                    </lightning-record-edit-form>
+                </div>
+                <!-- Modal/Popup Box LWC footer starts here -->
+                <footer class="slds-modal__footer">
+                    <button class="slds-button slds-button_neutral" onclick={closeModal} title="Cancel">Cancel</button>
+                   
+                </footer> 
+            </div>
+        </section>
+        <div class="slds-backdrop slds-backdrop_open"></div>
+    </template>
+</template>

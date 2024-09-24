@@ -1,0 +1,77 @@
+<template>
+        <lightning-quick-action-panel header="Docket Attachment">
+            <div class="body">
+                <template if:true={showSpinner}>
+                    <lightning-spinner alternative-text="Loading" size="large" variant="brand" class="spinner_container">
+                    </lightning-spinner> 
+                </template>
+                <lightning-record-edit-form object-api-name="Docket_Attachment__c" onsuccess={handleSuccess}
+                    onsubmit={handleSubmit}>
+                    <lightning-messages></lightning-messages>
+                    <input type="submit" class="hidden" />
+                    <lightning-layout multiple-rows class="slds-p-around_medium">
+                        
+                        <div if:false={isGuestUser} style="width: 100%">
+                            <lightning-layout-item size="12">
+                                <lightning-input-field field-name="Attachment_Type__c" variant="label-stacked" required onchange={onChangeAttachmentType}>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item if:true={isVisibleToCommunityNo} size="12">
+                                <lightning-input-field variant="label-stacked" field-name="Visible_to_Community__c" value={defaultVisibleToCommValue} onchange={onChangeVisibleToComm} required >
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item if:true={isShowToNote} size="12" >
+                                <lightning-input-field variant="label-stacked" field-name="Contains_FTI__c" onchange={onChangeVisibleToComm} required>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item if:true={isShowToNote} size="12">
+                                <lightning-input-field variant="label-stacked" field-name="FTI_Comments__c" >
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item if:true={isShowToNote} size="12">
+                                <lightning-input-field variant="label-stacked" field-name="Note__c" >
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" class="slds-p-top_small">
+                                <lightning-file-upload label="Upload File" variant="label-stacked" name="fileUploader" disabled={enableToUploadButton}
+                                    onuploadfinished={handleUploadFinished}>
+                                </lightning-file-upload>
+                            </lightning-layout-item>
+                        </div>
+                        <div if:true={isGuestUser} style="width: 100%; height: 210px;">
+                            <lightning-layout-item size="12"  class="slds-p-top_large">
+                                <lightning-combobox class="slds-p-top_medium"
+                                    required
+                                    name="Attachment Type"
+                                    label="Attachment Type"
+                                    value={attachmentTypeValueCo}
+                                    placeholder="Select Progress"
+                                    options={options}
+                                    onchange={handleChange} ></lightning-combobox>
+                            </lightning-layout-item>
+                            <lightning-layout-item if:true={isShowToNote} size="12" >
+                                <lightning-input-field  variant="label-stacked" field-name="Taxpayer_Notes__c" required={isNoteRequire} onchange={onChangeNotesCom}>
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <lightning-layout-item size="12" >
+                                <lightning-file-upload label="Upload File" variant="label-stacked" name="fileUploader" disabled={enableToUploadButton}
+                                    onuploadfinished={handleUploadFinished}>
+                                </lightning-file-upload>
+                            </lightning-layout-item>
+                        </div>
+                    </lightning-layout>
+                    <div style="display: flex;justify-content: right;">
+                        <div >
+                            <lightning-button variant="neutral" label="Cancel" onclick={closeQuickAction}></lightning-button>
+                        </div>
+                        <!-- <div >
+                            <lightning-button variant="brand" type="submit"  label="Upload Attachment" 
+                            class="slds-m-left_x-small">
+                        </lightning-button>
+                        </div> -->
+                    </div>
+                </lightning-record-edit-form>
+            </div>
+                
+        </lightning-quick-action-panel>
+    </template>

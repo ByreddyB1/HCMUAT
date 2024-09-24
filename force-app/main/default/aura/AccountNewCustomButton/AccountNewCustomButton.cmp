@@ -1,0 +1,13 @@
+<aura:component controller="AccountContactNew" implements="force:appHostable,flexipage:availableForAllPageTypes,flexipage:availableForRecordHome,force:hasRecordId,force:lightningQuickActionWithoutHeader,lightning:actionOverride,lightning:isUrlAddressable" access="global" >
+    <aura:html tag="style">
+        .slds-modal__container {
+            margin: 0 auto;
+            max-width: 100% !important;
+            width: 53% !important;
+        }
+    </aura:html>
+
+    <lightning:workspaceAPI aura:id="workspace"/>
+
+    <c:accountContactNew onclose="{!c.closeModel}" onsuccesst="{!c.redirectToSobject}"></c:accountContactNew>
+</aura:component>

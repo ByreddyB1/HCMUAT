@@ -1,0 +1,166 @@
+<template>
+    
+    <section role="dialog" tabindex="-1" aria-labelledby="modal-heading-01" aria-modal="true"
+        aria-describedby="modal-content-id-1" class="slds-modal slds-fade-in-open">
+        <div class="slds-modal__container abc">
+            <template if:true={showSpinner}>
+                <lightning-spinner alternative-text="Loading" size="large" variant="brand" class="spinner_container">
+                </lightning-spinner>
+            </template>
+            <header class="modal-header-override slds-modal__header slds-p-bottom_small">
+                <div class="slds-grid slds-gutters">
+                    <div class="field-container-header-title slds-col slds-size_11-of-12">
+                        <h2 id="modal-heading-01" class="whiteh2boldleft slds-text-heading_medium slds-hyphenate">New
+                            Account</h2>
+                    </div>
+                    <div class=" slds-size_1-of-12">
+                        <button class="slds-button slds-button_icon header-iconn " title="Close" onclick={closeModal}>
+                            <lightning-icon icon-name="utility:close" variant="bare-inverse" alternative-text="close"
+                                size="small" class="close-icon">
+                            </lightning-icon>
+                            <span class="slds-assistive-text">Close</span>
+                        </button>
+                    </div>
+                </div>
+            </header>
+            <div class="slds-modal__content slds-p-horizontal_medium slds-p-bottom_small" id="modal-content-id-1" style="min-height: 35%;">
+                <slot name="body">
+                    <lightning-record-edit-form object-api-name="Account" onsubmit={handleSubmit} onsuccess={handleSuccess} onerror={handleError}
+                        >
+                        <!--record-type-id={recordTypeId}onsubmit={handleSubmit}-->
+                        <!-- <lightning-messages></lightning-messages> -->
+                        <lightning-layout multiple-rows class="slds-p-top_medium">
+                            <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                <lightning-input-field data-field="Type" field-name="Type" onchange={onTypeSelect} required="true">
+                                </lightning-input-field>
+                            </lightning-layout-item>
+                            <div if:true={isAccountTypeSelected} style="width: 100%;">
+                                <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                    <lightning-input-field data-field="Name" field-name="Name" required="true" onfocusout={onAccountNameChange}>
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item if:true={isShowDivision} size="12" class=" slds-text-align_left ">
+                                    <lightning-input-field data-field="Division__c" field-name="Division__c" >
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item if:true={showForTaxpayers} size="12" class=" slds-text-align_left ">
+                                    <lightning-input-field data-field="Tax_ID__c" field-name="Tax_ID__c"  required="true" >
+                                    </lightning-input-field>
+                                    <P class="taxIdClass slds-m-left_x-small" style="color: var(--lwc-colorTextError,rgb(234, 0, 30)); text-align: left; display:none;">An Account already exists with this Tax ID. Please use the existing one instead of creating a duplicate. Click 
+                                        <lightning-button variant="base" label={existAccAsLabel} title={existAccAsLabel} onclick={handleClickOnAccLink} class="slds-m-left_x-small"></lightning-button> to view it.</P>
+                                </lightning-layout-item>
+                                <lightning-layout-item if:true={showForTaxpayers} size="12" class=" slds-text-align_left " onchange={onChangeFTI}>
+                                    <lightning-input-field data-field="Contains_FTI__c" field-name="Contains_FTI__c"  required="true">
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item if:true={showForTaxpayers} size="12" class=" slds-text-align_left ">
+                                    <lightning-input-field data-field="FTI_Comments__c" field-name="FTI_Comments__c" >
+                                    </lightning-input-field>
+                                </lightning-layout-item>
+                                <lightning-layout-item size="12" class=" slds-text-align_left "><!--onchange={genericInputChange}-->
+                                    <lightning-input-address
+                                        address-label="Account Address Information"
+                                        street-label="Street"
+                                        city-label="City"
+                                        country-label="Country"
+                                        province-label="State/Province"
+                                        postal-code-label="Zip/PostalCode"
+                                        show-address-lookup
+                                        onchange={genericInputChange}
+                                        field-level-help="Help Text for inputAddress field" ></lightning-input-address>
+                                </lightning-layout-item>
+                                
+                                <lightning-layout-item if:true={isShowConCreationOption} size="12" class=" slds-text-align_left ">
+                                    <lightning-input type="toggle" label="Would you like to create a Contact?"  message-toggle-active="Yes" message-toggle-inactive="No" onchange={onContactInfoTaggleChange} checked={isShowConInfo} name="contactInfo"></lightning-input>
+                                </lightning-layout-item>
+                                <lightning-layout-item if:true={isShowConInfo} size="12" class=" slds-text-align_left ">
+                                    <h2 class="header slds-text-heading_small" style=" font-weight: bold;">Contact Information</h2>
+                                    <lightning-record-edit-form class="contact-record-form" object-api-name="Contact" onsuccess={handleSuccessCon}
+                                    onsubmit={handleSubmitCon} onerror={handleErrorCon}>
+                                    <!-- <lightning-messages></lightning-messages> -->
+                                    <input type="submit" class="hidden" />
+                                    <lightning-layout multiple-rows class="slds-p-top_medium">
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="Salutation" field-name="Salutation" >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="FirstName" field-name="FirstName" value={firstName} >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="MiddleName" field-name="MiddleName"   >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="LastName" field-name="LastName" required="true" value={lastName} >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="Suffix" field-name="Suffix" >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="Phone" field-name="Phone" >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="Email" field-name="Email" >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="Title" field-name="Title" >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="Fax" field-name="Fax" >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item if:true={showForTaxpayers} size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="Contains_FTI__c" field-name="Contains_FTI__c" required="true" value={fTIValueAcc}>
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item if:true={showForTaxpayers} size="12" class=" slds-text-align_left ">
+                                            <lightning-input-field data-field="FTI_Comments__c" field-name="FTI_Comments__c" >
+                                            </lightning-input-field>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item size="12" class=" slds-text-align_left ">
+                                            <lightning-input type="toggle" label="Is the Contact’s address different from this Account’s?"  message-toggle-active="Yes" message-toggle-inactive="No" onchange={onContactAddTaggleChange}  name="contactAddInfo"></lightning-input>
+                                        </lightning-layout-item>
+                                        <lightning-layout-item if:true={isShowConAdd} size="12" class=" slds-text-align_left "><!--onchange={genericInputChange}-->
+                                            <lightning-input-address
+                                                address-label="Contact Address Information"
+                                                street-label="Street"
+                                                city-label="City"
+                                                country-label="Country"
+                                                province-label="State/Province"
+                                                postal-code-label="Zip/PostalCode"
+                                                show-address-lookup
+                                                onchange={genericInputChange}
+                                                field-level-help="Help Text for inputAddress field" ></lightning-input-address>
+                                        </lightning-layout-item>
+                                    </lightning-layout>
+                                </lightning-record-edit-form>
+                                </lightning-layout-item>
+                                <div style="display: flex;justify-content: right;">
+                                    <div class="slds-m-top_medium" style="margin-right: 25px;">
+                                        <lightning-button   name="Cancel" onclick={closeModal}
+                                        label="Cancel"></lightning-button>
+                                    </div>
+                                    <div class="slds-m-top_medium">
+                                        <lightning-button variant="brand"  type="submit" name="Save"
+                                    label="Save"></lightning-button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </lightning-layout>
+                        
+                    
+                    </lightning-record-edit-form>
+                </slot>
+            </div>
+        </div>
+    </section>
+    <div class="slds-backdrop slds-backdrop_open"></div>
+</template>

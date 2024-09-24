@@ -1,0 +1,74 @@
+<template>
+        <article class="slds-card">
+                <div class="slds-card__header slds-page-header slds-grid" style="    height: 4rem;border-bottom-left-radius: 0;border-bottom-right-radius: 0;
+        border-bottom: var(--lwc-borderWidthThin,1px) solid var(--lwc-cardColorBorder,rgb(227, 227, 227));">
+                        <header class="slds-media slds-media_center slds-has-flexi-truncate">
+                                <div class="slds-media__figure">
+                                        <lightning-icon icon-name="standard:account" size="small"></lightning-icon>
+                                </div>
+                                <div class="slds-media__body">
+                                        <h2 class="slds-card__header-title">
+                                                <a href="#" class="slds-card__header-link slds-truncate"
+                                                        title="Docket Attachments">
+                                                        <span>Docket Attachments ({count}) </span>
+                                                </a>
+                                        </h2>
+                                </div>
+                        </header>
+                </div>
+                <div class="slds-card__body slds-card__body_inner">
+                        <table class="slds-table slds-table_bordered  slds-table_fixed-layout " style="border-top: none;
+            border-bottom: none;">
+                                <thead>
+                                        <tr>
+                                                <th>
+                                                        <div class="slds-truncate">View/Download</div>
+                                                </th>
+                                                <!-- <th>
+                                                        <div class="slds-truncate">Download</div>
+                                                </th> -->
+                                                <th>
+                                                        <div class="slds-truncate">Name</div>
+                                                </th>
+                                                <th>
+                                                        <div class="slds-truncate">Attachment Type</div>
+                                                </th>
+                                                <th>
+                                                        <div class="slds-truncate">Note</div>
+                                                </th>
+
+                                        </tr>
+                                </thead>
+                                <tbody>
+                                        <template if:true={allFiles} for:each={allFiles} for:item="row">
+                                                <tr key={row.docId}>
+                                                        <td class="slds-truncate">
+                                                                <a class="slds-button slds-truncate" data-url={row.fileVDUrl}
+                                                                        data-extn={row.fileExtension}
+                                                                        data-fname={row.name}
+                                                                        onclick={filePreview}
+                                                                        title={row.name}>View/Download</a>
+                                                        </td>
+                                                        <!-- <td class="slds-truncate">
+                                                                <a class="slds-button " href={row.dUrl}>Download</a>
+                                                        </td> -->
+                                                        <td style="white-space: break-spaces;"> {row.name} </td>
+                                                        <td style="white-space: break-spaces;" title={row.attachmentType}>
+                                                                {row.attachmentType} </td>
+                                                        <td style="white-space: break-spaces;"> {row.notes} </td>
+                                                </tr>
+                                        </template>
+                                        <template if:false={allFiles}>
+                                                <div class="slds-p-left_small slds-text-heading_small">No available
+                                                        Docket Attachment</div>
+                                        </template>
+                                </tbody>
+                        </table>
+                </div>
+                <footer class="slds-card__footer">
+                        <!--a class="slds-card__footer-action" href="#">View All
+            <span class="slds-assistive-text">Accounts</span>
+          </a-->
+                </footer>
+        </article>
+</template>

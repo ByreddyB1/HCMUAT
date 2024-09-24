@@ -1,0 +1,51 @@
+<template>        
+    <lightning-card>   
+        <div class="slds-p-around_medium lgc-bg-inverse" style="display: flex">    
+            <lightning-button variant="inverse" label="Click Here To Fetch MiTreas Data" title="Fetch MiTreas" class="slds-align_absolute-center" onclick={fetchMitreasData}></lightning-button>
+        </div>
+
+	<!--	<template if:true = {isDatatableVisible}> -->
+
+        <div class = "slds-m-around_medium">    
+            <template if:true = {recordsToDisplay}>
+            <template if:true = {recordsToDisplay.length}>                    
+                <div style="height: 400px;">
+					<lightning-datatable
+							key-field="id"
+							data={recordsToDisplay}
+							columns={columns}
+							min-column-width="100"
+							max-column-width="400" 
+							onrowselection={handleRowSelection}>
+							
+					</lightning-datatable>
+				</div>
+
+				<div class="slds-align_absolute-center" slot="footer">
+						&nbsp;
+						<span class="slds-badge slds-badge_lightest" style="margin-right: 10px;margin-left: 10px;">Total Records : {totalRecords} &nbsp;&nbsp;&nbsp;</span>
+						&nbsp;
+						<lightning-button variant="brand" label="First" title="First" onclick={firstPage} class="slds-m-left_x-small" disabled={isFirst}></lightning-button>
+						<lightning-button variant="brand-outline" label="Previous" title="Previous" onclick={previousPage} class="slds-m-left_x-small" disabled={isPrevious}></lightning-button>
+						&nbsp;
+						<span class="slds-badge slds-badge_lightest" style="margin-right: 10px;margin-left: 10px;">Page {pageNumber} &nbsp;out of&nbsp; {totalPages} &nbsp;&nbsp;</span>
+						&nbsp;
+						<lightning-button variant="brand" label="Next" title="Next" onclick={nextPage} class="slds-m-left_x-small" disabled={isNext}></lightning-button>
+						<lightning-button variant="brand-outline" label="Last" title="Last" onclick={lastPage} class="slds-m-left_x-small" disabled={isLast}></lightning-button>
+						<lightning-button variant="brand" label="Create Docket Request" title="Doc Request" onclick={createDocketRequestCDR} class="slds-m-left_x-small" disabled={isCDRenabled}></lightning-button>
+				</div>    
+            </template>        
+            <template if:true = {error}>    
+                {error}>                    
+            </template>    
+		</template>
+        </div>   
+		
+<!--	</template> -->
+	<!--
+	<template if:false = {isDatatableVisible}>
+	
+	</template>
+	-->
+    </lightning-card>    
+</template>
